@@ -11,8 +11,10 @@ app.use(urlencoded({ extended: false }));
 app.post('/sms', async (req, res) => {
   const twiml = new MessagingResponse();
   const message = req.body.Body;
+  console.log("sending request for: ", message)
   const landText = await getLandText(message);
- 
+  console.log("got response")
+
   twiml.message(landText);
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());

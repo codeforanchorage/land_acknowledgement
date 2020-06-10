@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 async function getLandText(location) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
 
   const MODAL_BUTTON_SELECTOR = '.modal-footer > button';
