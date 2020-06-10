@@ -17,7 +17,8 @@ app.post('/sms', async (req, res) => {
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
 });
+const PORT = process.env.PORT || 4000;
 
-http.createServer(app).listen(4000, () => {
+http.createServer(app).listen(PORT, () => {
   console.log('Express server listening on port 4000');
 });
