@@ -23,7 +23,9 @@ This will create docker images and start containers for postgreSQL and a simple 
 curl -XPOST localhost:8000/ -d Body=Anchorage%2C+ak
 ```
 
- To bring service down and remove containers use:
+In development the webserver, gunicorn, will relaod on changes to the code. 
+
+To bring service down and remove containers use:
 
 ```
 docker-compose down
@@ -35,8 +37,6 @@ While the containers are running you can execute and attach a shell environment 
 ```
 docker exec -it landak_web sh 
 ```
-
-
 
 
 
