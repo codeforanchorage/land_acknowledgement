@@ -48,7 +48,7 @@ class LandResource(object):
             resp.body = str(twil_resp)
             return
 
-        twil_resp.message(f"In {location['city']}, {location['state']} you are on {r['name']} land")
+        twil_resp.message(f"In {location['city']}, {location['state']} you are on {r['name']} land.")
         resp.body = str(twil_resp)
 
 
