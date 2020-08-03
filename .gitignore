@@ -1,5 +1,7 @@
 node_modules
 data_dump.sql
 .env
+__pycache__/
+*.pyc
 
 .DS_Store
