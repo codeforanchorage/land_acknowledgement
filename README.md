@@ -46,7 +46,7 @@ docker exec -it landak_web sh
 Heroku:
 Add a postgres database add-on. The number of row in the database exceeds the limits for the free tier postgres. This requires at least the `Hobby-basic` ($9.00/month).
 
-#### create extension postgis
+#### Add postgis extension
 Connect to heroku postgres via the cli and add extension with `create extension postgis`
 
 ```
@@ -54,11 +54,14 @@ Connect to heroku postgres via the cli and add extension with `create extension 
 landak::DATABASE=> create extension postgis;
 ```
 
-Exit psql with `\q`/
+Exit psql with `\q`
 
-# Create backup of local database to restore to heroku
+#### Create backup of local database to restore to heroku
 The compressed format `--format=c` is required for Heroku.
+
+```
 pg_dump --format=c --compress=9 -U postgres postgres  > local_data/data_dump.sql
+```
 
 Upload the compressed sql file to S3(or some other accessible place) and pass it to the Heroku cli
  
