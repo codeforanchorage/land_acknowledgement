@@ -1,0 +1,5 @@
+FROM postgis/postgis:9.5-2.5-alpine
+COPY db_init ./docker-entrypoint-initdb.d
+WORKDIR /app
+COPY /data ./data
+RUN apk add gdal-tools

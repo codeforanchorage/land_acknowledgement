@@ -1,0 +1,33 @@
+version: '3.0'
+services:
+    postgres:
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        container_name: postgres_service
+        volumes:
+            - ./pg:/app/local_data
+        build:
+            context: ./pg
+    python:        
+        build: 
+            context: ./src
+        image: landak_web
+        depends_on:
+            - postgres
+        container_name: landak_web
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - PORT=8000
+            - PYTHONPATH='/usr/src/app'
+        volumes:
+            - ./src:/usr/src/
+        working_dir: /usr/src/
+        ports:
+            - "8000:8000"
+        tty: true
+        stdin_open: true
+        command: /usr/local/bin/gunicorn "app.web:app" -b 0.0.0.0:8000 
