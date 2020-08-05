@@ -2,8 +2,14 @@
 Land Acknowledgement is a simple api that links data about native lands to current locations. 
 
 # Data Sources
-Data about boundaries of Native land is from: [native-land.ca](https://native-land.ca)   
-Locations lookups are determined using data files from GeoNames (https://www.geonames.org) [zipcode data](http://download.geonames.org/export/zip/)
+This project does two basic things:  
+- determines a lat/lon from a city/state
+- looks up the native land from that point
+
+Contributions that improve either of these are welcome. Currently the data comes from:
+
+- Data about boundaries of Native land is from: [native-land.ca](https://native-land.ca)   
+- Locations lookups are determined using data files from GeoNames (https://www.geonames.org) [zipcode data](http://download.geonames.org/export/zip/)
 
 # Running locally
 **Requirements**  
@@ -23,7 +29,7 @@ This will create docker images and start containers for postgreSQL and a simple 
 curl -XPOST localhost:8000/ -d Body=Anchorage%2C+ak
 ```
 
-In development the webserver, gunicorn, will relaod on changes to the code. 
+In development the webserver, gunicorn, will reload on changes to the code. 
 
 To bring service down and remove containers use:
 
