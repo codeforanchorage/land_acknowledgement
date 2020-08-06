@@ -11,14 +11,13 @@ class GeoData():
         self.connection = None
 
     def connect(self):
-        if True:
-            try:
-                self.connection = psycopg2.connect(self.db_url)
-            except psycopg2.DatabaseError as e:
-                logger.error(e)
-                raise e
-            finally:
-                logger.info('Connected to database')
+        try:
+            self.connection = psycopg2.connect(self.db_url)
+        except psycopg2.DatabaseError as e:
+            logger.error(e)
+            raise e
+        finally:
+            logger.info('Connected to database')
 
     def query_location(self, location):
         '''
