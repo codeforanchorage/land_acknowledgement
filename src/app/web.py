@@ -5,7 +5,8 @@ from .db import GeoData
 
 def make_twilML(req, resp, resource):
     twil_resp = MessagingResponse()
-    resp.body = str(twil_resp.message(resp.body))
+    twil_resp.message(resp.body)
+    resp.body = str(twil_resp)
 
 
 @falcon.after(make_twilML)
