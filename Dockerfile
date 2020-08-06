@@ -6,7 +6,7 @@ RUN apk add python3-dev && \
     apk add --no-cache postgresql-libs && \
     apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
     pip3 install -r requirements.txt
-ENV WEB_CONCURRENCY=3
+ENV WEB_CONCURRENCY=4
 RUN adduser -D myuser
 USER myuser
 CMD gunicorn --bind 0.0.0.0:$PORT "app.web:app"

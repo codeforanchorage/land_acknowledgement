@@ -32,8 +32,6 @@ class GeoData():
             SELECT city, state, state_code, latitude, longitude from geo
             WHERE UPPER(concat(city, state)) = %(s)s
             OR UPPER(concat(city, state_code)) = %(s)s
-            OR metaphone(concat(city, state), 10) = metaphone(%(s)s, 10)
-            OR metaphone(concat(city, state_code), 10) = metaphone(%(s)s, 10)
             LIMIT 1
             '''
         with self.connection.cursor(cursor_factory=DictCursor) as cur:
