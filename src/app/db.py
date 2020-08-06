@@ -11,7 +11,7 @@ class GeoData():
         self.connection = None
 
     def connect(self):
-        if self.connection is None:
+        if True:
             try:
                 self.connection = psycopg2.connect(self.db_url)
             except psycopg2.DatabaseError as e:
@@ -28,17 +28,17 @@ class GeoData():
             return self.query_zip(location)
 
         smushed_name = re.sub(r'\W+', '', location).upper()
+
         query = '''
             SELECT city, state, state_code, latitude, longitude from geo
-            WHERE metaphone(concat(city, state), 10) = metaphone(%s, 10)
-            OR metaphone(concat(city, state_code), 10) = metaphone(%s, 10)
-            OR levenshtein(UPPER(CONCAT(city, state)), %s) < 2
-            OR levenshtein(UPPER(CONCAT(city, state_code)), %s) < 2
-            ORDER by levenshtein(UPPER(CONCAT(city, state_code)), %s)
+            WHERE UPPER(concat(city, state)) = %(s)s
+            OR UPPER(concat(city, state_code)) = %(s)s
+            OR metaphone(concat(city, state), 10) = metaphone(%(s)s, 10)
+            OR metaphone(concat(city, state_code), 10) = metaphone(%(s)s, 10)
             LIMIT 1
             '''
         with self.connection.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(query, (smushed_name, smushed_name, smushed_name, smushed_name, smushed_name))
+            cur.execute(query, {'s': smushed_name})
             return cur.fetchone()
 
     def query_zip(self, zipcode):
