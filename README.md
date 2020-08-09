@@ -9,7 +9,8 @@ This project does two basic things:
 Contributions that improve either of these are welcome. Currently the data comes from:
 
 - Data about boundaries of Native land is from: [native-land.ca](https://native-land.ca)   
-- Locations lookups are determined using data files from GeoNames (https://www.geonames.org) [zipcode data](http://download.geonames.org/export/zip/)
+- Locations lookups are determined using data files from U.S. Geographic Names Information System (GNIS) (https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data) 
+- Zipcode data is from geonames: [zipcode data](http://download.geonames.org/export/zip/)
 
 # Running locally
 **Requirements**  
