@@ -7,12 +7,23 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         state        varchar(100),
         city         varchar(180),
         latitude     real,
-        longitude    real,
+        longitude    real
     );
-    CREATE INDEX city_state_code on geo (UPPER(city || state_code));
-    CREATE INDEX city_state on geo (UPPER(city || state));
-    COPY geo FROM '/app/data/2019_GNIS_POP_PLACES.txt' WITH (FORMAT CSV, DELIMITER E'|', FORCE_NULL(accuracy));
+    CREATE TABLE zipcode (
+        zipcode      char(5),
+        state        varchar(100),
+        city         varchar(180),
+        latitude     real,
+        longitude    real
+    );
+    CREATE INDEX concat_city_state ON geo (regexp_replace(UPPER(city || state), '\W+', '', 'g'));
+    CREATE INDEX concat_city_state_code ON geo (regexp_replace(UPPER(city || state_code), '\W+', '', 'g'));
+    CREATE INDEX zips on zipcode (zipcode);
+    COPY geo FROM '/app/data/2019_GNIS_POP_PLACES.txt' WITH (FORMAT CSV, DELIMITER E'|');
+    COPY zipcode FROM '/app/data/zipcodes.txt' WITH (FORMAT CSV, DELIMITER E'|');
+
     VACUUM ANALYZE geo;
+    VACUUM ANALYZE zipcode;
 
 EOSQL
 ogr2ogr -f "PostgreSQL" PG:"dbname=postgres  user=postgres" "data/indigenousTerritories.json"

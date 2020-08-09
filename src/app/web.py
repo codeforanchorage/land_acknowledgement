@@ -12,8 +12,7 @@ def make_twilML(req, resp, resource):
 @falcon.after(make_twilML)
 class LandResource(object):
     def __init__(self):
-        self.geodata = GeoData()
-        self.geodata.connect()
+        self.geodata = None
 
     def on_get(self, req, resp):
         resp.body = (
@@ -21,6 +20,10 @@ class LandResource(object):
         )
 
     def on_post(self, req, resp):
+        print(req.params)
+        if self.geodata is None:
+            self.geodata = GeoData()
+            self.geodata.connect()
 
         query = req.get_param('Body')
 

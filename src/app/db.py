@@ -25,12 +25,15 @@ class GeoData():
         if re.match(r'^\d{5}(-\d{4})?$', location):
             return self.query_zip(location)
 
+        # To normalize variations like `Anchorage ak`, `Anchorage, Ak`, `Anchorage - AK`
+        # this concatenates the name and removes non-word characters which matche an index on
+        # postgres. If this goes beyond US names, this will need to change.
         smushed_name = re.sub(r'\W+', '', location).upper()
 
         query = '''
             SELECT city, state, state_code, latitude, longitude from geo
-            WHERE UPPER(city || state) = %(s)s
-            OR UPPER(city || state_code) = %(s)s
+            WHERE regexp_replace(UPPER(city || state), '\\W+', '', 'g') = %(s)s
+            OR regexp_replace(UPPER(city || state_code), '\\W+', '', 'g') = %(s)s
             LIMIT 1
             '''
         with self.connection.cursor(cursor_factory=DictCursor) as cur:
@@ -43,11 +46,12 @@ class GeoData():
         This will strip off the plus-4 if it's there.
         '''
         zipcode, *ext = zipcode.split('-')
+        print('looking for zip ', zipcode)
         if not re.match(r'^\d{5}$', zipcode):
             raise ValueError("Cannot parse this zip code.")
 
         query = '''
-            SELECT city, state, state_code, latitude, longitude from geo
+            SELECT state, city, latitude, longitude from zipcode
             WHERE zipcode = %s
             LIMIT 1
             '''
