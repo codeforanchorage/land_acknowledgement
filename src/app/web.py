@@ -11,6 +11,10 @@ def make_twilML(req, resp, resource):
 
 @falcon.after(make_twilML)
 class LandResource(object):
+    def __init__(self):
+        self.geodata = GeoData()
+        self.geodata.connect()
+
     def on_get(self, req, resp):
         resp.body = (
             'Nothing to see here.'
@@ -24,16 +28,13 @@ class LandResource(object):
             resp.body = "Please tell me the town and state you are in. For example, 'Anchorage, AK'"
             return
 
-        geodata = GeoData()
-        geodata.connect()
-
-        location = geodata.query_location(query)
+        location = self.geodata.query_location(query)
 
         if location is None:
             resp.body = f"I could not find the location: {query}"
             return
 
-        r = geodata.native_land_from_point(location['latitude'], location['longitude'])
+        r = self.geodata.native_land_from_point(location['latitude'], location['longitude'])
 
         if r is None:
             resp.body = f"Sorry, I could not find anything about {location['city']}, {location['state']}"

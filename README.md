@@ -75,6 +75,8 @@ Upload the compressed sql file to S3(or some other accessible place) and pass it
  heroku pg:backups:restore https://landak-sql-dump.s3-us-west-2.amazonaws.com/data_dump.sql postgresql-opaque-24019 --app landak
  ```
 
+Where `postgresql-opaque-24019` would be the name of your actual database and `landak` the name of your app.
+
 The Dockerfile on the top-level directory will build an image appropriate for Heroku. To build a push this use:
 
 ```

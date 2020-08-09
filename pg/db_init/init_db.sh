@@ -19,5 +19,6 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE INDEX city_state_code on geo (UPPER(city || state_code));
     CREATE INDEX city_state on geo (UPPER(city || state));
     COPY geo FROM '/app/data/US.txt' WITH (FORMAT CSV, DELIMITER E'\t', FORCE_NULL(accuracy));
+    VACUUM ANALYZE geo;
 EOSQL
 ogr2ogr -f "PostgreSQL" PG:"dbname=postgres  user=postgres" "data/indigenousTerritories.json"
