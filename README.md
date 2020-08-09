@@ -9,7 +9,8 @@ This project does two basic things:
 Contributions that improve either of these are welcome. Currently the data comes from:
 
 - Data about boundaries of Native land is from: [native-land.ca](https://native-land.ca)   
-- Locations lookups are determined using data files from GeoNames (https://www.geonames.org) [zipcode data](http://download.geonames.org/export/zip/)
+- Locations lookups are determined using data files from U.S. Geographic Names Information System (GNIS) (https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data) 
+- Zipcode data is from geonames: [zipcode data](http://download.geonames.org/export/zip/)
 
 # Running locally
 **Requirements**  
@@ -74,6 +75,8 @@ Upload the compressed sql file to S3(or some other accessible place) and pass it
  ```
  heroku pg:backups:restore https://landak-sql-dump.s3-us-west-2.amazonaws.com/data_dump.sql postgresql-opaque-24019 --app landak
  ```
+
+Where `postgresql-opaque-24019` would be the name of your actual database and `landak` the name of your app.
 
 The Dockerfile on the top-level directory will build an image appropriate for Heroku. To build a push this use:
 
