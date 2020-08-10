@@ -26,7 +26,7 @@ class GeoData():
             return self.query_zip(location)
 
         # To normalize variations like `Anchorage ak`, `Anchorage, Ak`, `Anchorage - AK`
-        # this concatenates the name and removes non-word characters which matche an index on
+        # this concatenates the name and removes non-word characters which matches an index on
         # postgres. If this goes beyond US names, this will need to change.
         smushed_name = re.sub(r'\W+', '', location).upper()
 
@@ -46,7 +46,7 @@ class GeoData():
         This will strip off the plus-4 if it's there.
         '''
         zipcode, *ext = zipcode.split('-')
-        print('looking for zip ', zipcode)
+
         if not re.match(r'^\d{5}$', zipcode):
             raise ValueError("Cannot parse this zip code.")
 
@@ -65,10 +65,12 @@ class GeoData():
         Point is interpetered as srid 4326 (WGS 84 : https://spatialreference.org/ref/epsg/4326/)
         '''
         query = '''
-        SELECT id, name
+        SELECT name, description
         FROM indigenousterritories
-        WHERE ST_Contains(wkb_geometry,ST_GeometryFromText('POINT( %s %s)', 4326) );
+        WHERE ST_Contains(wkb_geometry,ST_GeometryFromText('POINT( %s %s)', 4326) )
+        GROUP BY name, description
+        ;
         '''
         with self.connection.cursor(cursor_factory=DictCursor) as cur:
             cur.execute(query, (lon, lat))
-            return cur.fetchone()
+            return cur.fetchall()
