@@ -1,23 +1,55 @@
 import os
 import re
+import logging
+from functools import wraps
 import psycopg2
 from psycopg2.extras import DictCursor
-from .logger import logger
+from tenacity import retry, wait_exponential, stop_after_attempt
+
+logger = logging.getLogger('gunicorn.error')
+
+
+def retry_connection(f):
+    '''Decorator to allow retrying connection when the DB drops the connection'''
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential()
+    )
+    @wraps(f)
+    def wrapper(geoObj, *args, **kwds):
+        try:
+            return f(geoObj, *args, **kwds)
+        except (psycopg2.InterfaceError, psycopg2.OperationalError) as e:
+            logger.warning(e)
+            geoObj.reconnect()
+            raise e
+    return wrapper
 
 
 class GeoData():
     def __init__(self):
         self.db_url = os.getenv('DATABASE_URL', default='postgresql://postgres:postgres@postgres')
-        self.connection = None
+        self._connection = None
 
     def connect(self):
-        if self.connection is None:
+        if self._connection is None:
             try:
-                self.connection = psycopg2.connect(self.db_url)
+                self._connection = psycopg2.connect(self.db_url)
             except psycopg2.DatabaseError as e:
                 logger.error(e)
                 raise e
 
+    def reconnect(self):
+        self._connection = None
+        self.connect()
+
+    @property
+    def connection(self):
+        if self._connection is None:
+            self.connect()
+        return self._connection
+
+    @retry_connection
     def query_location(self, location):
         '''
         Find a place and coordinates using fuzzy name matching.
@@ -40,15 +72,13 @@ class GeoData():
             cur.execute(query, {'s': smushed_name})
             return cur.fetchone()
 
+    @retry_connection
     def query_zip(self, zipcode):
         '''
         Find a place and coordinates from zip code. The DB only has 5-digit codes
         This will strip off the plus-4 if it's there.
         '''
         zipcode, *ext = zipcode.split('-')
-
-        if not re.match(r'^\d{5}$', zipcode):
-            raise ValueError("Cannot parse this zip code.")
 
         query = '''
             SELECT state, city, latitude, longitude from zipcode
@@ -59,6 +89,7 @@ class GeoData():
             cur.execute(query, (zipcode, ))
             return cur.fetchone()
 
+    @retry_connection
     def native_land_from_point(self, lat, lon):
         '''
         Lookup native land that contains point.
