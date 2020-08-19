@@ -43,6 +43,8 @@ footer {
 h1 {
     color:#CD5C5C;
     margin-bottom:1em;
+    font-size: 7.5vw;
+
 } h1::after {
     display:block;
     content:"";
@@ -84,5 +86,11 @@ hr {
     main{
         width: 50%;
         padding: 1em 4em;
+    }
+}
+
+@media screen and (min-width:460px){
+    h1{
+        font-size:2em
     }
 }
