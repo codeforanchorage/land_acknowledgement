@@ -16,7 +16,7 @@ def response_from_locations(location, lands):
     '''Converts lists of lands into string sent to user'''
     names = [land['name'] for land in lands]
     prefix = f"In {location['city']}, {location['state']} you are on"
-
+    suffix = "\nMore info: bit.ly/landackn"
     if len(lands) == 1:
         land_string = names[0]
     elif len(lands) == 2:
@@ -25,7 +25,7 @@ def response_from_locations(location, lands):
         all_but_last = ', '.join(names[:-1])
         land_string = f'{all_but_last}, and {names[-1]}'
 
-    return f'{prefix} {land_string} land.'
+    return f'{prefix} {land_string} land. {suffix}'
 
 
 def check_empty_input(req, resp, resource, params):
