@@ -1,3 +1,4 @@
+import json
 import falcon
 from twilio.twiml.messaging_response import MessagingResponse
 from .db import GeoData
@@ -43,11 +44,10 @@ class LandResource(object):
 
     @falcon.before(check_empty_input)
     def on_post(self, req, resp):
-        print(req.params)
+        print(json.dumps(req.params))
 
         if self.geodata is None:
             self.geodata = GeoData()
-            self.geodata.connect()
 
         query = req.get_param('Body').strip()
 
