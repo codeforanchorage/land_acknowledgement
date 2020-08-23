@@ -11,6 +11,49 @@ import pytest
 from falcon import testing
 from app.web import create_app
 from xml.dom import minidom
+from app.responses import SUFFIX
+
+
+@pytest.fixture
+def good_geo_location():
+    return {
+        'type': 'FeatureCollection',
+        'query': ['anchorage', 'ak'],
+        'features': [{
+                'id': 'place.19268916718032980',
+                'type': 'Feature',
+                'place_type': ['place'],
+                'relevance': 1,
+                'properties': {'wikidata': 'Q39450'},
+                'text': 'Anchorage',
+                'place_name': 'Anchorage, Alaska, United States',
+                'bbox': [-159.516899997364, 55.8944109861981, -141.00268595324, 70.6124380154738],
+                'center': [-149.8949, 61.2163],
+                'geometry': {'type': 'Point', 'coordinates': [-149.8949, 61.2163]},
+                'context': [
+                    {
+                        'id': 'region.19678797538778630',
+                        'wikidata': 'Q797',
+                        'short_code': 'US-AK',
+                        'text': 'Alaska'
+                    },
+                    {
+                        'id': 'country.19678805456372290',
+                        'short_code': 'us',
+                        'wikidata': 'Q30',
+                        'text': 'United States'
+                    }]
+        }]
+    }
+
+
+class FakeResp:
+    def __init__(self, data, status_code):
+        self.data = data
+        self.status_code = status_code
+
+    def json(self):
+        return self.data
 
 
 def get_message_from_xml(xml_string):
@@ -25,50 +68,60 @@ def client():
     return testing.TestClient(create_app())
 
 
-@patch('app.web.GeoData.query_location')
-def test_unknown_location(query_location, client):
-    '''It should respond with help text when location can't be found'''
-    query_location.return_value = None
-    result = client.simulate_post('/', params={'Body': "Sometown, ak"})
-    assert get_message_from_xml(result.text) == 'I could not find the location: Sometown, ak'
+@patch('app.geocode.requests.get')
+def test_404_location(geolocate, client):
+    '''It should communicate that the location can't be found'''
+    geolocate.return_value = FakeResp({'message': 'Not Found'}, 404)
+    result = client.simulate_post('/', params={'Body': "Blah"})
+    assert get_message_from_xml(result.text) == "I could not find the location: Blah"
 
 
-@patch('app.web.GeoData.query_location')
+@patch('app.geocode.requests.get')
+def test_unknown_location(geolocate, client):
+    '''It should communicate that the location can't be found'''
+    geolocate.return_value = FakeResp({'features': []}, 200)
+    result = client.simulate_post('/', params={'Body': "Blah"})
+    assert get_message_from_xml(result.text) == "I could not find the location: Blah"
+
+
+@patch('app.geocode.requests.get')
 @patch('app.web.GeoData.native_land_from_point')
-def test_unfound_acknowledgement(from_point, query_location, client):
+def test_unfound_acknowledgement(from_point, query_location, good_geo_location, client):
     '''It should respond with help text when there's no native land for a point'''
-    query_location.return_value = {'city': 'Paris', 'state': 'France', 'latitude': 45.928, 'longitude': -67.56}
+    query_location.return_value = FakeResp(good_geo_location, 200)
     from_point.return_value = []
 
-    result = client.simulate_post('/', params={'Body': "Paris, France"})
-    assert get_message_from_xml(result.text) == 'Sorry, I could not find anything about Paris, France.'
+    result = client.simulate_post('/', params={'Body': "Anchorage, AK"})
+    assert get_message_from_xml(result.text) == f"Sorry, I don't have information about Anchorage, AK.\n{SUFFIX}"
 
 
-@patch('app.web.GeoData.query_location')
+@patch('app.geocode.requests.get')
 @patch('app.web.GeoData.native_land_from_point')
-def test_single_result(from_point, query_location, client):
+def test_single_result(from_point, query_location, good_geo_location, client):
     '''It should respond with a single result when there's only one'''
-    query_location.return_value = {'city': 'Adacao', 'state': 'Guam', 'latitude': 45.928, 'longitude': -67.56}
+    print(good_geo_location)
+
+    query_location.return_value = FakeResp(good_geo_location, 200)
     from_point.return_value = [{'name': 'Chamorro'}]
-    result = client.simulate_post('/', params={'Body': "Adacao, gu"})
-    assert get_message_from_xml(result.text) == 'In Adacao, Guam you are on Chamorro land.'
+    result = client.simulate_post('/', params={'Body': "Anchorage, AK"})
+    assert get_message_from_xml(result.text) == f'In Anchorage, Alaska you are on Chamorro land.\n{SUFFIX}'
 
 
-@patch('app.web.GeoData.query_location')
+@patch('app.geocode.requests.get')
 @patch('app.web.GeoData.native_land_from_point')
-def test_two_results(from_point, query_location, client):
+def test_two_results(from_point, query_location, good_geo_location, client):
     '''It should respond with a two results when there's two results'''
-    query_location.return_value = {'city': 'Portland', 'state': 'Oregon', 'latitude': 45.928, 'longitude': -67.56}
+    query_location.return_value = FakeResp(good_geo_location, 200)
     from_point.return_value = [{'name': 'Cowlitz'}, {'name': 'Clackamas'}]
-    result = client.simulate_post('/', params={'Body': "Portland, or"})
-    assert get_message_from_xml(result.text) == 'In Portland, Oregon you are on Cowlitz and Clackamas land.'
+    result = client.simulate_post('/', params={'Body': "Anchorage, AK"})
+    assert get_message_from_xml(result.text) == f'In Anchorage, Alaska you are on Cowlitz and Clackamas land.\n{SUFFIX}'
 
 
-@patch('app.web.GeoData.query_location')
+@patch('app.geocode.requests.get')
 @patch('app.web.GeoData.native_land_from_point')
-def test_multiple_results(from_point, query_location, client):
+def test_multiple_results(from_point, query_location, good_geo_location, client):
     '''It prefers the Oxford comma'''
-    query_location.return_value = {'city': 'Seattle', 'state': 'Washington', 'latitude': 45.928, 'longitude': -67.56}
+    query_location.return_value = FakeResp(good_geo_location, 200)
     from_point.return_value = [{'name': 'Duwamish'}, {'name': 'Coast Salish'}, {'name': 'Suquamish'}]
-    result = client.simulate_post('/', params={'Body': "Seattle, wa"})
-    assert get_message_from_xml(result.text) == 'In Seattle, Washington you are on Duwamish, Coast Salish, and Suquamish land.' # noqa E501
+    result = client.simulate_post('/', params={'Body': "Anchorage, AK"})
+    assert get_message_from_xml(result.text) == f'In Anchorage, Alaska you are on Duwamish, Coast Salish, and Suquamish land.\n{SUFFIX}' # noqa E501

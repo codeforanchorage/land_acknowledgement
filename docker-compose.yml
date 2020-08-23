@@ -25,6 +25,7 @@ services:
             - PORT=8000
             - PYTHONPATH='/usr/src/app'
             - WEB_CONCURRENCY=3
+            - MAPBOX_TOKEN=${MAPBOX_TOKEN}
         volumes:
             - ./src:/usr/src/
         working_dir: /usr/src/

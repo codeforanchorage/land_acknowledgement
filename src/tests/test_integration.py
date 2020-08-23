@@ -11,6 +11,7 @@ import pytest
 from falcon import testing
 from app.web import create_app
 from xml.dom import minidom
+from app.responses import SUFFIX
 
 
 def get_message_from_xml(xml_string):
@@ -25,10 +26,10 @@ def client():
     return testing.TestClient(create_app())
 
 
-def test_unknown_location(client):
+def test_an_unknown_location(client):
     '''It should respond with help text when location can't be found'''
-    result = client.simulate_post('/', params={'Body': "Sometown, ak"})
-    assert get_message_from_xml(result.text) == 'I could not find the location: Sometown, ak'
+    result = client.simulate_post('/', params={'Body': "Blah"})
+    assert get_message_from_xml(result.text) == f"Sorry, I don't have information about Blah.\n{SUFFIX}"
 
 
 def test_known_greeting(client):
@@ -37,19 +38,19 @@ def test_known_greeting(client):
     assert get_message_from_xml(result.text) == "Hello. Please tell me the town and state you are in. For example, 'Anchorage, AK'" # noqa E501
 
 
-def tes_empty_input(client):
+def test_empty_input(client):
     '''It should respond with help text when location can't be found'''
     result = client.simulate_post('/', params={'Body': ""})
     assert get_message_from_xml(result.text) == "Hello. Please tell me the town and state you are in. For example, 'Anchorage, AK'" # noqa E501
 
 
 def test_known_location(client):
-    '''It should respond with help text when location can't be found'''
+    '''It should respond land when location can be found'''
     result = client.simulate_post('/', params={'Body': "Minneapolis, MN"})
-    assert get_message_from_xml(result.text) == 'In Minneapolis, Minnesota you are on Anishinabewaki ᐊᓂᔑᓈᐯᐗᑭ, Wahpekute, and Očeti Šakówiŋ (Sioux) land.'  # noqa E501
+    assert get_message_from_xml(result.text) == f'In Minneapolis, Minnesota you are on Wahpekute and Očeti Šakówiŋ (Sioux) land.\n{SUFFIX}'  # noqa E501
 
 
 def test_zipcode_location(client):
     '''It should respond with help text when location can't be found'''
     result = client.simulate_post('/', params={'Body': "99577"})
-    assert get_message_from_xml(result.text) == "In Eagle River, Alaska you are on Dena'ina Ełnena land."
+    assert get_message_from_xml(result.text) == f"In the area of 99577 you are on Dena'ina Ełnena land.\n{SUFFIX}"
