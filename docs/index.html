@@ -25,6 +25,64 @@
 
             ga('create', 'UA-56999250-1', 'auto');
             ga('send', 'pageview');
+                
+            document.getElementById('landForm').addEventListener('submit', submitFunction)
+
+
+function submitFunction(e) {
+
+  console.log("top of un")
+  
+  // console.log('the form content')
+  console.log("this isthe value???")
+  console.log(e.target[0].value)
+  console.log(e)
+
+// var textInput = document.getElementById("textInput").value
+// console.log(textInput)
+
+  // const base_url = "https://ak-land.herokuapp.com/"
+  // const base_url = "https://ak-land.herokuapp.com/?Body=austin,mn"
+  const base_url = `https://cors-anywhere.herokuapp.com/https://ak-land.herokuapp.com/?Body=${e.target[0].value}`
+  const location_url = `https://ak-land.herokuapp.com/?Body=${textInput}`
+
+  // console.log(location_url)
+
+  e.preventDefault();
+
+
+  axios.post(base_url)
+  .then(function(response)  {
+
+    var parser = new DOMParser();
+
+    console.log(response.data);
+
+
+var xml_parsed =  parser.parseFromString(response.data,"text/xml");
+
+console.log(xml_parsed)
+
+
+//this isthe formatted version
+var xml_parsed_format = xml_parsed.getElementsByTagName("Message")[0].childNodes[0].nodeValue;
+console.log (xml_parsed_format)
+
+    
+// var string_length = xml_parsed_format.length;
+// var xml_parsed_format_short = xml_parsed_format.slice(0, string_length-26)
+
+//cut off the last sentance
+var xml_parsed_format_short = xml_parsed_format.replace("More info: bit.ly/landackn", " ")
+
+
+document.getElementById('output').innerHTML = xml_parsed_format_short
+
+  }, (error) => {
+    console.log(error);
+  });
+ 
+}
 
             </script>
     </head>
