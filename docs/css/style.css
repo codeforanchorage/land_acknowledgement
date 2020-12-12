@@ -18,10 +18,9 @@ body {
 }
 
 input#textInput {
-    size: 25;
-    width: 70%;
-    height:40px;
-    font-size:2em;
+    font-size: 1.2em;
+    padding: 1%;
+    margin: 1.5%;
 }
 
 main {
