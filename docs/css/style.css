@@ -19,6 +19,9 @@ body {
 
 input {
     size: 25;
+    width: 70%;
+    height:40px;
+    font-size:2em;
 }
 
 main {
