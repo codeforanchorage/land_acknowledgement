@@ -12,7 +12,8 @@
 /* Element Stylings */
 
 body {
-    background-image: url("../img/alaskaPhoto.jpg");
+    background-color: #333;
+    <---    background-image: url("../img/alaskaPhoto.jpg"); --->
     font-family: 'Arvo', serif;
     letter-spacing:0.05em;
 }
