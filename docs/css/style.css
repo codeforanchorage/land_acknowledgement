@@ -59,6 +59,12 @@ h1 {
     border-bottom: 1px solid #CD5C5C;
 }
 
+h2 {
+    color:#CD5C5C;
+    margin-bottom:1em;
+    font-size: 3vw;
+}
+
 a {
     color: rgba(255,255,255,0.9);
 }
