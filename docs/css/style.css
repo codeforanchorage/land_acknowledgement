@@ -17,7 +17,7 @@ body {
     letter-spacing:0.05em;
 }
 
-input {
+input#textInput {
     size: 25;
     width: 70%;
     height:40px;
