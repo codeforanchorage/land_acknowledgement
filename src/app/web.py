@@ -2,6 +2,15 @@ import json
 import falcon
 from twilio.twiml.messaging_response import MessagingResponse
 from .db import GeoData
+from .geocode import geolocate, LocationNotFound
+from .responses import (
+    TooBigResponse,
+    PostalCodeResponse,
+    PlaceResponse,
+    AddressResponse,
+    PoiResponse,
+    GenericResponse
+)
 
 
 class Make_TwilML:
@@ -12,22 +21,6 @@ class Make_TwilML:
         resp.body = str(twil_resp)
 
 
-def response_from_locations(location, lands):
-    '''Converts lists of lands into string sent to user'''
-    names = [land['name'] for land in lands]
-    prefix = f"In {location['city']}, {location['state']} you are on"
-    suffix = "\nMore info: bit.ly/landackn"
-    if len(lands) == 1:
-        land_string = names[0]
-    elif len(lands) == 2:
-        land_string = ' and '.join(names)
-    else:
-        all_but_last = ', '.join(names[:-1])
-        land_string = f'{all_but_last}, and {names[-1]}'
-
-    return f'{prefix} {land_string} land. {suffix}'
-
-
 def check_empty_input(req, resp, resource, params):
     '''Hook to intercept empty messages or messages with predictable greetings'''
     greetings = {'hello', 'hi', 'help'}
@@ -36,11 +29,25 @@ def check_empty_input(req, resp, resource, params):
     if not query or query.lower() in greetings:
         body = "Hello. Please tell me the town and state you are in. For example, 'Anchorage, AK'"
         raise falcon.HTTPStatus(falcon.HTTP_200, body=body)
+    elif len(query) < 3:
+        body = "Hmm, that seems a little vague. Try sending a city and state such as 'Anchorage, AK'"
+        raise falcon.HTTPStatus(falcon.HTTP_200, body=body)
 
 
 class LandResource(object):
     def __init__(self):
         self.geodata = None
+        self.type_dispatch = {
+            'country': TooBigResponse,
+            'region': TooBigResponse,
+            'postcode': PostalCodeResponse,
+            'district': TooBigResponse,
+            'place': PlaceResponse,
+            'locality': PlaceResponse,
+            'neighborhood': PlaceResponse,  # these might be to vauge to handle
+            'address': AddressResponse,
+            'poi': PoiResponse
+        }
 
     @falcon.before(check_empty_input)
     def on_post(self, req, resp):
@@ -51,17 +58,19 @@ class LandResource(object):
 
         query = req.get_param('Body').strip()
 
-        location = self.geodata.query_location(query)
-        if location is None:
+        try:
+            location = geolocate(query)
+        except LocationNotFound:
             raise falcon.HTTPStatus(falcon.HTTP_200, body=f"I could not find the location: {query}")
+        except Exception as e:
+            print(e)
+            raise falcon.HTTPStatus(falcon.HTTP_200, body="Sorry, I having some technical trouble right now.")
 
-        r = self.geodata.native_land_from_point(location['latitude'], location['longitude'])
+        place_type = location['place_type'][0]
+        response_class = self.type_dispatch.get(place_type, GenericResponse)
+        response = response_class(query, location, self.geodata)
 
-        if not r:
-            body = f"Sorry, I could not find anything about {location['city']}, {location['state']}."
-            raise falcon.HTTPStatus(falcon.HTTP_200, body=body)
-
-        resp.body = response_from_locations(location, r)
+        resp.body = str(response)
 
 
 def create_app():
