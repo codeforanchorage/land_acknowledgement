@@ -4,7 +4,7 @@ In general we are hoping for place and postal code locations. Larger areas like 
 and countries don't make sense and the classes should respond appropirately.
 '''
 
-MORE_INFO_LINK = "https://land.codeforanchorage.org"
+MORE_INFO_LINK = "land.codeforanchorage.org"
 SUFFIX = f"More info: {MORE_INFO_LINK}"
 
 
