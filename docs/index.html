@@ -25,10 +25,10 @@
 
             ga('create', 'UA-56999250-1', 'auto');
             ga('send', 'pageview');
-        </script>    
-                
+        </script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
-            
+
     </head>
     <body>
         <main id="content">
@@ -36,14 +36,14 @@
             <h1>Land Acknowledgement</h1>
             </header>
            <section>
-           <form id='landForm' onsubmit ="submitFunction(e)" > 
-            <h2>Whose land am I on?</h2>              
-          <form id = 'landForm'>                      
-              <input type="text" id="textInput" placeholder="City, State or Zip Code">      
-              <input type="submit" >                  
-          </form>                                     
-               <h3><div id="output"></div></h3>               
-          </section>                                   
+           <form id='landForm' onsubmit ="submitFunction" >
+            <h2>Whose land am I on?</h2>
+          <form id = 'landForm'>
+              <input type="text" id="textInput" placeholder="City, State or Zip Code">
+              <input type="submit" >
+          </form>
+               <h3><div id="output"></div></h3>
+          </section>
             <section>
                 <h2>Or message your Canadian or US zip code or [city, state], or city, state & country for Australia, NZ or South America to the</p>
                 <a target="_blank" href="https://www.messenger.com/t/LandAcknowledgement">Facebook Messenger bot</a>
@@ -51,20 +51,20 @@
             </section>
             <hr/>
               <section>
-                <h2>Data from the amazing, <a target="_blank" href="https://native-land.ca/">Native Land</a>, a Canadian not-for profit, who also 
-                    just launched new versions of their 
-                    <A target="_blank" HREF="https://native-land.ca/resources/mobile-app/">mobile apps.</A> Please consider joining 
-                  their <a target="_blank" href="https://www.patreon.com/nativeland">Patreon community</A> to help fund their research and projects.</h2> 
-                  <p>Land Acknowledgement Bot is an SMS and Facebook Messenger bot leveraging data from Canadian 
+                <h2>Data from the amazing, <a target="_blank" href="https://native-land.ca/">Native Land</a>, a Canadian not-for profit, who also
+                    just launched new versions of their
+                    <A target="_blank" HREF="https://native-land.ca/resources/mobile-app/">mobile apps.</A> Please consider joining
+                  their <a target="_blank" href="https://www.patreon.com/nativeland">Patreon community</A> to help fund their research and projects.</h2>
+                  <p>Land Acknowledgement Bot is an SMS and Facebook Messenger bot leveraging data from Canadian
                       not-for-profit, <a target="_blank" href="https://native-land.ca/">Native Land</a>,
-                    who ask that people use the data carefully because confirmation by nations is pending and they are updating data weekly. Short <a target="_blank" href="https://www.youtube.com/watch?v=h0Bz408Y5DU">Land Acknowledgement</a> explanation from 
-                    <a target="_blank" href="https://pbskids.org/molly/">Molly of Denali</a> including 
+                    who ask that people use the data carefully because confirmation by nations is pending and they are updating data weekly. Short <a target="_blank" href="https://www.youtube.com/watch?v=h0Bz408Y5DU">Land Acknowledgement</a> explanation from
+                    <a target="_blank" href="https://pbskids.org/molly/">Molly of Denali</a> including
                   footage of kids at the <a target="_blank" href="https://www.anchoragemuseum.org/">Anchorage Museum</a></p>
-                <p>Here is a resource on 
+                <p>Here is a resource on
                     <a target="_blank" href="https://embracingequity.org/blog/2019/5/1/honor-native-land">Land Acknowledgement</a></p>
             </section>
             <section>
-                <p>The application is a collaboration between <a target="_blank" href="https://codeforanchorage.org">Code for Anchorage</a> and the 
+                <p>The application is a collaboration between <a target="_blank" href="https://codeforanchorage.org">Code for Anchorage</a> and the
                     <a target="_blank" href="https://medium.com/anchorage-i-team">Anchorage i-team</a>.</p>
             </section>
             <br/>
@@ -76,13 +76,13 @@
         </main>
     </body>
 <script>
-                        
-document.getElementById('landForm').addEventListener('submit', submitFunction)                        
+
+document.getElementById('landForm').addEventListener('submit', submitFunction)
 
 function submitFunction(e) {
 
   console.log("top of un")
-  
+
   // console.log('the form content')
   console.log("this isthe value???")
   console.log(e.target[0].value)
@@ -93,7 +93,8 @@ function submitFunction(e) {
 
   // const base_url = "https://ak-land.herokuapp.com/"
   // const base_url = "https://ak-land.herokuapp.com/?Body=austin,mn"
-  const base_url = `https://anchorage-land-cors.herokuapp.com/https://ak-land.herokuapp.com/?Body=${e.target[0].value}`
+  //const base_url = `https://anchorage-land-cors.herokuapp.com/https://ak-land.herokuapp.com/?Body=${e.target[0].value}`
+  const base_url = `https://anchorage-land-cors.herokuapp.com/https://42fehusrq0.execute-api.us-west-2.amazonaws.com/api/${e.target[0].value}`
   const location_url = `https://ak-land.herokuapp.com/?Body=${textInput}`
 
   // console.log(location_url)
@@ -101,37 +102,16 @@ function submitFunction(e) {
   e.preventDefault();
 
 
-  axios.post(base_url)
+  axios.get(base_url)
   .then(function(response)  {
-
-    var parser = new DOMParser();
-
     console.log(response.data);
-
-
-var xml_parsed =  parser.parseFromString(response.data,"text/xml");
-
-console.log(xml_parsed)
-
-
-//this isthe formatted version
-var xml_parsed_format = xml_parsed.getElementsByTagName("Message")[0].childNodes[0].nodeValue;
-console.log (xml_parsed_format)
-
-    
-// var string_length = xml_parsed_format.length;
-// var xml_parsed_format_short = xml_parsed_format.slice(0, string_length-26)
-
-//cut off the last sentance
-var xml_parsed_format_short = xml_parsed_format.replace("More info: land.codeforanchorage.org", " ")
-
-
-document.getElementById('output').innerHTML = xml_parsed_format_short
-
+    var xml_parsed =  response.data
+    console.log(xml_parsed)
+    document.getElementById('output').innerHTML = xml_parsed
   }, (error) => {
-    console.log(error);
+      console.log(error);
   });
- 
-}
-            </script>                 
+
+  }
+            </script>
 </html>
