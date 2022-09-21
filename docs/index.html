@@ -80,38 +80,22 @@
 document.getElementById('landForm').addEventListener('submit', submitFunction)
 
 function submitFunction(e) {
-
-  console.log("top of un")
-
-  // console.log('the form content')
-  console.log("this isthe value???")
-  console.log(e.target[0].value)
-  console.log(e)
-
-// var textInput = document.getElementById("textInput").value
 // console.log(textInput)
 
   // const base_url = "https://ak-land.herokuapp.com/"
   // const base_url = "https://ak-land.herokuapp.com/?Body=austin,mn"
   //const base_url = `https://anchorage-land-cors.herokuapp.com/https://ak-land.herokuapp.com/?Body=${e.target[0].value}`
   const base_url = `https://anchorage-land-cors.herokuapp.com/https://42fehusrq0.execute-api.us-west-2.amazonaws.com/api/${e.target[0].value}`
-  const location_url = `https://ak-land.herokuapp.com/?Body=${textInput}`
-
-  // console.log(location_url)
 
   e.preventDefault();
 
 
   axios.get(base_url)
   .then(function(response)  {
-    console.log(response.data);
-    var xml_parsed =  response.data
-    console.log(xml_parsed)
-    document.getElementById('output').innerHTML = xml_parsed
+    document.getElementById('output').innerHTML = response.data
   }, (error) => {
-      console.log(error);
+    console.log(error);
   });
-
-  }
+}
             </script>
 </html>
