@@ -1,3 +1,7 @@
+# **SUPERSEDED**
+
+This repo has been superseded. Please see and make new edits and issues on the [new repo](https://github.com/codeforanchorage/land_acknowledgement_lambda).
+
 # Land Acknowledgement SMS App
 Land Acknowledgement is a simple api that links data about native lands to current locations. 
 
