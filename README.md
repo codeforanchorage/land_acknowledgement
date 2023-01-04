@@ -1,4 +1,6 @@
 # Land Acknowledgement SMS App
+Land Acknowledgement has been rewritten using AWS Lambda and the new repo is at [https://github.com/codeforanchorage/land_acknowledgement_lambda](https://github.com/codeforanchorage/land_acknowledgement_lambda)
+
 Land Acknowledgement is a simple api that links data about native lands to current locations. 
 
 # Data Sources
