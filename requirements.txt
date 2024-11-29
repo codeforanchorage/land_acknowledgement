@@ -10,7 +10,7 @@ packaging==20.4
 pluggy==0.13.1
 psycopg2-binary==2.8.5
 py==1.10.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyparsing==2.4.7
 pytest==6.0.1
 pytz==2020.1
